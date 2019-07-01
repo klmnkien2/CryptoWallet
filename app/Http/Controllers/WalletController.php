@@ -8,6 +8,7 @@ use App\Services\EthereumService;
 use App\Wallet;
 use App\Http\Resources\Wallet as WalletReource;
 use Illuminate\Http\Request;
+use Web3p\EthereumTx\Transaction;
 
 class WalletController extends Controller
 {
@@ -82,6 +83,8 @@ class WalletController extends Controller
         $fromAddress = $request->input('fromAddress');
         $toAddress = $request->input('toAddress');
         $amount = $request->input('amount');
+        $gas = $request->input('gas');
+        $gasPrice = $request->input('gasPrice');
 
         $wallet = Wallet::where('address', '=', $fromAddress)->first();
 //        $gasPrice = $this->ethereumService->getGasPrice();
@@ -94,23 +97,28 @@ class WalletController extends Controller
         $response = $this->ethereumService->getTransactionCount($fromAddress);
         $ethereumNonce = $response['result'];
 
-        return response()->json([
-            'fromAddress' => $fromAddress,
-            'toAddress' => $toAddress,
-            'amount' => $amount,
-//            'gasPrice' => $gasPrice,
-            'ethereumNonce' => $ethereumNonce,
-            'privateKey' => substr($wallet->private, 2),
+        $transaction = new Transaction([
+            'nonce' => $ethereumNonce,
+            'from' => $fromAddress,
+            'to' => $toAddress,
+            'gas' => $gas,
+            'gasPrice' => $gasPrice,
+            'value' => $amount,
+            'data' => '',
+            'chainId' => 3,
         ]);
+        $privateKey = substr($wallet->private, 2);
+        $rawData = '0x' . $transaction->sign($privateKey);
+
+        return $this->sendTransaction($rawData);
     }
 
-    public function sendTransaction(Request $request)
+    private function sendTransaction($rawData)
     {
-        $rawData = $request->input('rawData');
         if (empty($rawData)) {
             return response()->json([
                 'error' => 'Transaction data is null.'
-            ]);
+            ], 500);
         }
         $txHash = '';
         $response = $this->ethereumService->sendRaw($rawData);
@@ -120,7 +128,7 @@ class WalletController extends Controller
         if (empty($txHash)) {
             return response()->json([
                 'error' => 'Transaction could not be done.'
-            ]);
+            ], 500);
         }
         return response()->json([
             'txHash' => $txHash

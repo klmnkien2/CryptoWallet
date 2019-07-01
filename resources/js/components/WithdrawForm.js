@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import axios from "axios";
-var util = require('ethereumjs-util');
+
+var web3util = require('web3-utils');
 var etherTx = require('ethereumjs-tx');
 
 class WithdrawForm extends Component {
@@ -34,7 +35,9 @@ class WithdrawForm extends Component {
         var bodyFormData = new FormData();
         bodyFormData.set('fromAddress', this.state.fromAddress);
         bodyFormData.set('toAddress', this.state.toAddress);
-        bodyFormData.set('amount', this.state.amount);
+        bodyFormData.set('amount', web3util.toHex(web3util.toWei(this.state.amount, 'ether')));
+        bodyFormData.set('gasPrice', web3util.toHex(30000));
+        bodyFormData.set('gas', web3util.toHex(100000));
         axios({
             method: 'post',
             url: window.Laravel.baseUrl + '/api/wallets/transaction/prepare',
@@ -42,9 +45,18 @@ class WithdrawForm extends Component {
             config: { headers: {'Content-Type': 'multipart/form-data' }}
         })
             .then(response => {
-                this.sendRawTransaction(response.data)
+                this.setState(prevState => ({
+                    txHash: response.data.txHash
+                }))
+                this.setState(prevState => ({
+                    fromAddress: '',
+                    toAddress: '',
+                    amount: '',
+                    disableWithdraw: false
+                }))
+                $('input, select').val('');
             })
-            .catch(function (error) {
+            .catch(error => {
                 if (error.response) {
                     // The request was made and the server responded with a status code
                     // that falls out of the range of 2xx
@@ -88,7 +100,7 @@ class WithdrawForm extends Component {
                     disableWithdraw: false
                 }))
             })
-            .catch(function (error) {
+            .catch(error => {
                 if (error.response) {
                     // The request was made and the server responded with a status code
                     // that falls out of the range of 2xx
@@ -114,7 +126,7 @@ class WithdrawForm extends Component {
             <form onSubmit={this.handleSubmit}>
                 <div className='form-group'>
                     <label htmlFor='fromAddress'>Address</label>
-                    <select className='form-control' id='fromAddress' onChange={this.handleChange} required>
+                    <select className='form-control' id='fromAddress' onChange={this.handleChange} value={this.state.fromAddress} required >
                         <option>Choose one</option>
                         {addresses}
                     </select>
@@ -122,12 +134,12 @@ class WithdrawForm extends Component {
                 <div className='form-group'>
                     <label htmlFor='toAddress'>To Address</label>
                     <input type='text' className='form-control' id='toAddress' placeholder='To Address'
-                           onChange={this.handleChange} required />
+                           onChange={this.handleChange} required value={this.state.toAddress} />
                 </div>
                 <div className='form-group'>
                     <label htmlFor='amount'>Amount</label>
-                    <input type='text' className='form-control' id='amount' placeholder='Amount'
-                           onChange={this.handleChange} required />
+                    <input type="number" step="any" className='form-control' id='amount' placeholder='Amount'
+                           onChange={this.handleChange} required value={this.state.amount} />
                 </div>
                 <button type='submit' className='btn btn-primary' disabled={this.state.disableWithdraw}>Withdraw</button>
                 {messageResult}
