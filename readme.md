@@ -1,65 +1,38 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></p>
+## Tech-stack
+- User Laravel 5.7 with Reactjs
+- Tested in  Windows 64-bit with Node.js 10.x only. Please copy node_modules from my .zip file. Because there are some problems with Ethereum lib version. 
+- Single-page web, every interaction call api only.
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/d/total.svg" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/v/stable.svg" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://poser.pugx.org/laravel/framework/license.svg" alt="License"></a>
-</p>
+## Requirement
+1. Manage Ethereum Wallet
+- Generate an address correctly, which can use in ethereum system
+- Could manage addresses, view balance, information. Delete from your wallets
+2. Can do withdrawal
+- From your wallet, pick any ethereum address. Input an address that will receive ETH, input amount. Then you can transfer ETH
+- You can only transfer from addresses in your wallet (that you manage)
+- Show transaction id (and link) to validate transaction
 
-## About Laravel
+## Installation Guide
+(PHP part)
+- Clone github repo: https://github.com/klmnkien2/CryptoWallet.git
+- composer install
+- cp .env.example .env
+- edit .env file, config your DB info
+- php artisan migrate
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel attempts to take the pain out of development by easing common tasks used in the majority of web projects, such as:
+(If you need an ethereum address that have balance to test)
+- php artisan db:seed --class=WalletsTableSeeder  (You may need to rum composer dump-autoload before)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- For unit test run: vendor/bin/phpunit tests/Feature/ (check files for more details)
 
-Laravel is accessible, yet powerful, providing tools needed for large, robust applications.
+(Reactjs part)
+- npm install
+- npm run development
 
-## Learning Laravel
+## How to use
+- Go to browser , access localhost
+- You can see a table of addresses and a form to withdraw
+- If you click to 'Add a wallet' - an address will be generated ( you can also go to https://ropsten.etherscan.io and access that address too )
+- If you want to withdraw. Choose an address in your wallet (you can choose only these address) -> Then input an address (any address in ropsten network is accepted) -> Choose value (float, and use . as decimal char) -> click Withdraw button
+- NOTED: There should be some validation. But haven't added yet
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of any modern web application framework, making it a breeze to get started learning the framework.
-
-If you're not in the mood to read, [Laracasts](https://laracasts.com) contains over 1100 video tutorials on a range of topics including Laravel, modern PHP, unit testing, JavaScript, and more. Boost the skill level of yourself and your entire team by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for helping fund on-going Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell):
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[British Software Development](https://www.britishsoftware.co)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- [UserInsights](https://userinsights.com)
-- [Fragrantica](https://www.fragrantica.com)
-- [SOFTonSOFA](https://softonsofa.com/)
-- [User10](https://user10.com)
-- [Soumettre.fr](https://soumettre.fr/)
-- [CodeBrisk](https://codebrisk.com)
-- [1Forge](https://1forge.com)
-- [TECPRESSO](https://tecpresso.co.jp/)
-- [Runtime Converter](http://runtimeconverter.com/)
-- [WebL'Agence](https://weblagence.com/)
-- [Invoice Ninja](https://www.invoiceninja.com)
-- [iMi digital](https://www.imi-digital.de/)
-- [Earthlink](https://www.earthlink.ro/)
-- [Steadfast Collective](https://steadfastcollective.com/)
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
